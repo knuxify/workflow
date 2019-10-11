@@ -1,0 +1,20 @@
+#!/usr/bin/bash -x
+# See the workflow file for more information
+if [[ ! -e "$HOME/.config/workflow/startup-time" ]] || [[ -z "$(cat $HOME/.config/workflow/startup-time)" ]]; then
+	echo "No startup time specified. Read the 'HOW IT WORKS' section at the beggining of the workflow file."
+	exit 1
+fi
+touch "$HOME/.config/workflow/.lock"
+
+until [[ ! -e "$HOME/.config/workflow/.lock" ]]; do
+	while read -re workdate; do
+		if [[ "$workdate" == "$(date '+%H:%M %u')" ]]; then
+			rm -f "$HOME/.config/workflow/.lock"
+			workflow
+		elif [[ "$workdate" == *" 0" ]] && [[ "$(echo $workdate | awk '{print $1;}')" == "$(date '+%H:%M')" ]]; then
+			rm -f "$HOME/.config/workflow/.lock"
+			workflow
+		fi
+	done < "$HOME/.config/workflow/startup-time"
+	sleep 5s
+done
