@@ -1,1 +1,2 @@
 - run different modules at different times
+- improve exit (currently exiting workflow mode if still in a viable time range will turn workflow mode back on)
