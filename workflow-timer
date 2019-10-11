@@ -8,13 +8,35 @@ touch "$HOME/.config/workflow/.lock"
 
 until [[ ! -e "$HOME/.config/workflow/.lock" ]]; do
 	while read -re workdate; do
+		week="0"
+		hour="0"
 		if [[ "$workdate" == "$(date '+%H:%M %u')" ]]; then
+			week="1"
+			hour="1"
+		elif [[ "$(echo $workdate | awk '{print $1;}')" == "$(date '+%H:%M')" ]]; then
+			week="1"
+			hour="1"
+		elif [[ "$workdate" == *"-"*" "* ]] && [[ "$(echo $workdate | awk '{print $1;}' | sed 's/-.*//' | sed 's/\://g' | sed 's/^0*//')" -le "$(date +%H%M | sed 's/^0*//')" ]] && [[ "$(echo $workdate | awk '{print $1;}' | sed -e 's#.*-\(\)#\1#' | sed 's/\://g' | sed 's/^0*//')" -ge "$(date +%H%M | sed 's/^0*//')" ]]; then
+			hour="1"
+		fi
+		if [[ "$week" == "0" ]]; then
+			if [[ "$workdate" == *" 0" ]]; then
+				week="1"
+			elif [[ "$workdate" == *" "*"-"* ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed 's/-.*//')" -le "$(date +%u)" ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed -e 's#.*-\(\)#\1#')" -ge "$(date +%u)" ]]; then
+				week="1"
+			fi
+		fi
+		if [[ "$week" == "1" ]] && [[ "$hour" == "1" ]]; then
 			rm -f "$HOME/.config/workflow/.lock"
-			workflow
-		elif [[ "$workdate" == *" 0" ]] && [[ "$(echo $workdate | awk '{print $1;}')" == "$(date '+%H:%M')" ]]; then
-			rm -f "$HOME/.config/workflow/.lock"
-			workflow
+			workflow "$(echo $workdate | awk '{print $3;}')"
+			break
 		fi
 	done < "$HOME/.config/workflow/startup-time"
-	sleep 5s
+	if [[ "$week" == "1" ]] && [[ "$hour" == "1" ]]; then
+		until [[ -e "$HOME/.config/workflow/.lock" ]]; do
+			sleep 5s
+		done
+	else
+		sleep 10s
+	fi
 done
