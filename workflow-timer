@@ -4,36 +4,60 @@ if [[ ! -e "$HOME/.config/workflow/startup-time" ]] || [[ -z "$(cat $HOME/.confi
 	echo "No startup time specified. Read the 'HOW IT WORKS' section at the beggining of the workflow file."
 	exit 1
 fi
-touch "$HOME/.config/workflow/.lock"
+# Create the initial timer lock
+touch "$HOME/.config/workflow/.timerlock"
 
-until [[ ! -e "$HOME/.config/workflow/.lock" ]]; do
+# For as long as the timer lock is present...
+until [[ ! -e "$HOME/.config/workflow/.timerlock" ]]; do
+	linenumber=0
+	# ...cycle through the startup-time file to read the workflow dates, and store these values temporarily in the workdate variable.
 	while read -re workdate; do
+		# This is used to calculate the line number, and is crucial for lockfiles:
+		let linenumber++
+		# This sets "week" and "hour" to 0: these values don't store the actual week and hour of activation. Rather, they serve as an indication of whether the week day and hour+minute match.
 		week="0"
 		hour="0"
+		## Hour, minute and full date matches
+		# If the date is an exact match
 		if [[ "$workdate" == "$(date '+%H:%M %u')" ]]; then
 			week="1"
 			hour="1"
+		# If the hour and minute matches
 		elif [[ "$(echo $workdate | awk '{print $1;}')" == "$(date '+%H:%M')" ]]; then
-			week="1"
 			hour="1"
+		# If the hour and minute matches a time range
 		elif [[ "$workdate" == *"-"*" "* ]] && [[ "$(echo $workdate | awk '{print $1;}' | sed 's/-.*//' | sed 's/\://g' | sed 's/^0*//')" -le "$(date +%H%M | sed 's/^0*//')" ]] && [[ "$(echo $workdate | awk '{print $1;}' | sed -e 's#.*-\(\)#\1#' | sed 's/\://g' | sed 's/^0*//')" -ge "$(date +%H%M | sed 's/^0*//')" ]]; then
 			hour="1"
 		fi
+		## Week day matches
 		if [[ "$week" == "0" ]]; then
+			# Week day in file is set to 0 (runs every day of the week)
 			if [[ "$workdate" == *" 0" ]]; then
 				week="1"
+			# Week day matches current week day
+			elif [[ "$workdate" == *" $(date +%u)" ]]; then
+				week="1"
+			# Week day matches range
 			elif [[ "$workdate" == *" "*"-"* ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed 's/-.*//')" -le "$(date +%u)" ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed -e 's#.*-\(\)#\1#')" -ge "$(date +%u)" ]]; then
 				week="1"
 			fi
 		fi
 		if [[ "$week" == "1" ]] && [[ "$hour" == "1" ]]; then
-			rm -f "$HOME/.config/workflow/.lock"
-			workflow "$(echo $workdate | awk '{print $3;}')"
-			break
+			# If the line had already been executed today, ignore;
+			if [[ -e "$HOME/.config/workflow/.lock-$linenumber" ]]; then
+				continue
+			else
+			# Otherwise, remove the timer lock and create a lock for the current line, then activate the modules through workflow:
+				rm -f "$HOME/.config/workflow/.timerlock"
+				echo "$workdate" > "$HOME/.config/workflow/.lock-$linenumber"
+				workflow "$(echo $workdate | awk '{print $3;}')"
+				break
+			fi
 		fi
 	done < "$HOME/.config/workflow/startup-time"
+	# If the week and hour have matched, the timer waits until the timer lock is present again. Otherwise, it waits 10 seconds before retrying.
 	if [[ "$week" == "1" ]] && [[ "$hour" == "1" ]]; then
-		until [[ -e "$HOME/.config/workflow/.lock" ]]; do
+		until [[ -e "$HOME/.config/workflow/.timerlock" ]]; do
 			sleep 5s
 		done
 	else
