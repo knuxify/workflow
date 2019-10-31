@@ -1,4 +1,4 @@
-#!/usr/bin/bash -x
+#!/usr/bin/env bash
 # See the workflow file for more information
 if [[ ! -e "$HOME/.config/workflow/startup-time" ]] || [[ -z "$(cat $HOME/.config/workflow/startup-time)" ]]; then
 	echo "No startup time specified. Read the 'HOW IT WORKS' section at the beggining of the workflow file."
@@ -6,33 +6,25 @@ if [[ ! -e "$HOME/.config/workflow/startup-time" ]] || [[ -z "$(cat $HOME/.confi
 fi
 # This function takes care of refreshing the line-specific lockfiles. It is kept as a function because why not.
 lockfile_refresh() {
-	# Loop through all lockfiles.
+	# Loop through all lockfiles. The match methods used here are simillar to the ones used in the main loop.
 	for lockfile in $HOME/.config/workflow/.lock-*; do
 		workdate="$(cat $lockfile)"
 		# This sets "week" and "hour" to 0: these values don't store the actual week and hour of activation. Rather, they serve as an indication of whether the week day and hour+minute match.
 		week="0"
 		hour="0"
-		## Hour, minute and full date matches
-		# If the date is an exact match
-		if [[ "$workdate" == "$(date '+%H:%M %u')" ]]; then
+		if [[ "$workdate" != "$(date '+%H:%M %u')" ]]; then
 			week="1"
 			hour="1"
-		# If the hour and minute matches
-		elif [[ "$(echo $workdate | awk '{print $1;}')" == "$(date '+%H:%M')" ]]; then
+		elif [[ "$(echo $workdate | awk '{print $1;}')" != "$(date '+%H:%M')" ]]; then
 			hour="1"
-		# If the hour and minute matches a time range
 		elif [[ "$workdate" == *"-"*" "* ]] && [[ "$(echo $workdate | awk '{print $1;}' | sed 's/-.*//' | sed 's/\://g' | sed 's/^0*//')" -gt "$(date +%H%M | sed 's/^0*//')" ]] && [[ "$(echo $workdate | awk '{print $1;}' | sed -e 's#.*-\(\)#\1#' | sed 's/\://g' | sed 's/^0*//')" -lt "$(date +%H%M | sed 's/^0*//')" ]]; then
 			hour="1"
 		fi
-		## Week day matches
 		if [[ "$week" == "0" ]]; then
-			# Week day in file is set to 0 (runs every day of the week)
 			if [[ "$workdate" == *" 0"* ]]; then
 				week="1"
-			# Week day matches current week day
-			elif [[ "$workdate" == *" $(date +%u)"* ]]; then
+			elif [[ "$workdate" != *" $(date +%u)"* ]]; then
 				week="1"
-			# Week day matches range
 			elif [[ "$workdate" == *" "*"-"* ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed 's/-.*//')" -gt "$(date +%u)" ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed -e 's#.*-\(\)#\1#')" -lt "$(date +%u)" ]]; then
 				week="1"
 			fi
