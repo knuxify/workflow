@@ -1,15 +1,31 @@
 # workflow - a small bash application that prevents you from procrastinating
 
+## Usage
+
+Run ``workflow-timer`` to automatically start workflow at certain times.
+
+You can also run ``workflow`` manually (Usage: ``workflow <modules>``).
+
+To exit out of workflow, run ``workflow exit``.
+
+## How it works
+
+workflow-timer runs in the background, waits for a certain hour (or until it's called manually) and, once activated, loads "modules" - small bash scripts with two functions: start and end.
+The start function is called when workflow mode starts and the end function is called when workflow mode ends.
+
 ## Installing
 
 Copy the workflow and workflow-timer files to /usr/bin, then run on workflow-timer on startup (reffer to your environment's documentation)
 
 Alternatively, you can just call the workflow command from a cron job.
 
-## How it works
+## Initial setup
 
-workflow-timer runs in the background, waits for a certain hour (or until it's called manually) and, once activated, loads "modules" - small bash scripts with two functions: start and end.
-The start function is called when workflow mode starts and the end function is called when workflow mode ends.
+In order to use workflow, you'll need to add modules to it. A good place to start would be picking something the sample-modules folder. In order to add a module, copy it to the ``$HOME/.config/workflow`` folder, then add the module name with the full path to ``$HOME/.config/workflow/modules``, separating the module name and full path by a space (see Modules in the Configuration section below).
+
+Then, follow the configuration guide for the workflow timer.
+
+Finally, run workflow-timer on startup as your user.
 
 ## Configuration
 
