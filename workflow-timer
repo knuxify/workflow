@@ -4,9 +4,6 @@ if [[ ! -e "$HOME/.config/workflow/startup-time" ]] || [[ -z "$(cat $HOME/.confi
 	echo "No startup time specified. Read the 'HOW IT WORKS' section at the beggining of the workflow file."
 	exit 1
 fi
-# Create the initial timer lock
-touch "$HOME/.config/workflow/.timerlock"
-
 # This function takes care of refreshing the line-specific lockfiles. It is kept as a function because why not.
 lockfile_refresh() {
 	# Loop through all lockfiles.
@@ -46,8 +43,8 @@ lockfile_refresh() {
 	done
 }
 
-# For as long as the timer lock is present...
-until [[ ! -e "$HOME/.config/workflow/.timerlock" ]]; do
+# For as long as workflow-timer is running...
+while true; do
 	break=0
 	linenumber=0
 	# ...refresh the lockfiles (which was moved to a separate function to keep things looking nice)...
@@ -88,8 +85,7 @@ until [[ ! -e "$HOME/.config/workflow/.timerlock" ]]; do
 				if [[ "$(cat $lockfile)" == "$workdate" ]]; then
 					continue
 				else
-				# Otherwise, remove the timer lock and create a lock for the current line, then activate the modules through workflow:
-					rm -f "$HOME/.config/workflow/.timerlock"
+				# Otherwise, create a lock for the current line, then activate the modules through workflow:
 					locknum=0
 					until [[ ! -e "$HOME/.config/workflow/.lock-$locknum" ]]; do
 						let locknum++
