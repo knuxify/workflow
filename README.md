@@ -1,19 +1,23 @@
 # workflow - a small bash application that prevents you from procrastinating
 
-## HOW IT WORKS
+## Installing
 
-workflow runs in the background, waits for a certain hour (or until it's called manually) and, once activated, loads "modules" - small bash scripts with two functions: start and end.
+Copy the workflow and workflow-timer files to /usr/bin, then run on workflow-timer on startup (reffer to your environment's documentation)
+
+Alternatively, you can just call the workflow command from a cron job.
+
+## How it works
+
+workflow-timer runs in the background, waits for a certain hour (or until it's called manually) and, once activated, loads "modules" - small bash scripts with two functions: start and end.
 The start function is called when workflow mode starts and the end function is called when workflow mode ends.
 
-Modules are defined in a configuration file: $HOME/.config/workflow/modules. This location is also reccomended for storing modules. In order to create a module, add it to the module file like so:
+## Configuration
 
-```
-modulename "/full/path/to/module"
-```
+### Workflow timer
 
-Then, to enable it, add it on a new line to the $HOME/.config/workflow/modules.enabled file.
-In order to start workflow automatically at a certain hour, add the following to the config
-file located at $HOME/.config/workflow/startup-time:
+The workflow-timer is a script that runs in the background. It automatically starts workflow with certain modules (see section titled Modules below).
+
+In order to start workflow automatically at a certain hour, add the following to the config file located at $HOME/.config/workflow/startup-time:
 
 ```
 HH:MM W
@@ -29,11 +33,22 @@ In order to run workflow between certain hours, separate the two hours with a da
 HH:MM-HH:MM W
 ```
 
-You can also store multiple startup hours. Simply put them on new lines in the startup-time
-file.
+In order to run certain modules at certain hour, you can provide them:
 
-## INSTALLING
+```
+HH:MM W module1 module2 module3 ...
+```
 
-Copy the workflow, wfexit and workflow-timer files to /usr/bin, then run on workflow-timer on startup (reffer to your environment's documentation)
+You can also store multiple startup hours. Simply put them on new lines in the startup-time file.
 
-Alternatively, you can just call the workflow command from a cron job.
+### Modules
+
+Modules are shorthands for scripts that can be called by workflow.
+
+Modules are defined in a configuration file: $HOME/.config/workflow/modules. This config location is also reccomended for storing modules. In order to create a module, add it to the module file like so:
+
+```
+modulename "/full/path/to/module"
+```
+
+In order to use a module, run workflow with the modules as arguments, separated by spaces. You can also place them in the $HOME/.config/workflow/modules.enabled file (although keep in mind that the arguments will take priority over this file).
