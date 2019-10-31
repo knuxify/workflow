@@ -1,8 +1,0 @@
-[Unit]
-Description=Workflow Timer
-
-[Service]
-ExecStart=/usr/bin/workflow-timer
-
-[Install]
-WantedBy=multi-user.target
