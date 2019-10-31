@@ -38,7 +38,7 @@ if [[ "$*" ]]; then
 			rm "$HOME/.config/workflow/modules.loaded"
 			touch "$HOME/.config/workflow/.lock"
 			break
-		elif [[ "$mod" != "autoend" ]]; then
+		else
 			path="$(grep $toload $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
 			if [[ -z "$path" ]]; then
 				echo "WARNING: Module $toload was supposed to be loaded, but it is not specified in the modules file."

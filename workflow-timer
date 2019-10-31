@@ -27,10 +27,10 @@ lockfile_refresh() {
 		## Week day matches
 		if [[ "$week" == "0" ]]; then
 			# Week day in file is set to 0 (runs every day of the week)
-			if [[ "$workdate" == *" 0" ]]; then
+			if [[ "$workdate" == *" 0"* ]]; then
 				week="1"
 			# Week day matches current week day
-			elif [[ "$workdate" == *" $(date +%u)" ]]; then
+			elif [[ "$workdate" == *" $(date +%u)"* ]]; then
 				week="1"
 			# Week day matches range
 			elif [[ "$workdate" == *" "*"-"* ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed 's/-.*//')" -gt "$(date +%u)" ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed -e 's#.*-\(\)#\1#')" -lt "$(date +%u)" ]]; then
@@ -69,10 +69,10 @@ while true; do
 		## Week day matches
 		if [[ "$week" == "0" ]]; then
 			# Week day in file is set to 0 (runs every day of the week)
-			if [[ "$workdate" == *" 0" ]]; then
+			if [[ "$workdate" == *" 0"* ]]; then
 				week="1"
 			# Week day matches current week day
-			elif [[ "$workdate" == *" $(date +%u)" ]]; then
+			elif [[ "$workdate" == *" $(date +%u)"* ]]; then
 				week="1"
 			# Week day matches range
 			elif [[ "$workdate" == *" "*"-"* ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed 's/-.*//')" -le "$(date +%u)" ]] && [[ "$(echo $workdate | awk '{print $2;}' | sed -e 's#.*-\(\)#\1#')" -ge "$(date +%u)" ]]; then
