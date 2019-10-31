@@ -34,8 +34,10 @@ if [[ "$*" ]]; then
 				source "$path"
 				end
 				unset -f start end
-			done < "$HOME/.config/workflow/modules.enabled"
+			done < "$HOME/.config/workflow/modules.loaded"
+			rm "$HOME/.config/workflow/modules.loaded"
 			touch "$HOME/.config/workflow/.lock"
+			break
 		elif [[ "$mod" != "autoend" ]]; then
 			path="$(grep $toload $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
 			if [[ -z "$path" ]]; then
@@ -48,6 +50,7 @@ if [[ "$*" ]]; then
 			fi
 			source "$path"
 			start
+			echo "$toload" | awk '{print $1;}' >> "$HOME/.config/workflow/modules.loaded"
 			unset -f start end
 		fi
 	done
@@ -64,6 +67,7 @@ elif [[ -e "$HOME/.config/workflow/modules.enabled" ]]; then
 		fi
 		source "$path"
 		start
+		echo "$toload" | awk '{print $1;}' >> "$HOME/.config/workflow/modules.loaded"
 		unset -f start end
 	done < "$HOME/.config/workflow/modules.enabled"
 else
