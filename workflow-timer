@@ -40,6 +40,9 @@ lockfile_refresh() {
 				week="1"
 			fi
 		fi
+		if [[ "$week" == "1" ]] && [[ "$hour" == "1" ]]; then
+			rm "$lockfile"
+		fi
 	done
 }
 
