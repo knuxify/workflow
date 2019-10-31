@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+
+##################################################################
+# Workflow module                                                #
+# Name: Notification                                             #
+# Description: Customizable template for a one-time notification #
+##################################################################
+
+## User modifiable values:
+unset title body
+title="Test notification"
+body="Test notification content."
+
+start() {
+	if command -v "notify-send" &>/dev/null; then
+		notify-send "$title" "$body"
+	elif command -v "kdialog" &>/dev/null; then
+		kdialog --title "$title" --passivepopup "$body"
+	elif command -v "zenity" &>/dev/null; then
+		zenity --notification --text="$body"
+	else
+		echo "No notification program found!"
+	fi
+}
+
+end() {
+	true
+}
