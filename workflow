@@ -21,53 +21,54 @@ if [[ "$*" ]]; then
 		if [[ "$mod" == "exit" ]]; then
 			read -p "Are you sure you want to exit workflow mode? [y/N] " -re exitoption
 			if [[ "$exitoption" == "y" ]] || [[ "$exitoption" == "Y" ]]; then
-			while read -re toload; do
-				path="$(grep $toload $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
-				if [[ -z "$path" ]]; then
-					echo "WARNING: Module $toload was supposed to be loaded, but it is not specified in the modules file."
-					continue
-				fi
-			    if [[ ! -e "$path" ]]; then
-			        echo "WARNING: File $path (required by module $toload) does not exist."
-			        continue
-			    fi
-				source "$path"
-				end
-				unset -f start end
-			done < "$HOME/.config/workflow/modules.loaded"
-			rm "$HOME/.config/workflow/modules.loaded"
-			touch "$HOME/.config/workflow/.lock"
-			break
+				while read -re toload; do
+					path="$(grep $toload $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
+					if [[ -z "$path" ]]; then
+						echo "WARNING: Module $toload was supposed to be loaded, but it is not specified in the modules file."
+						continue
+					fi
+				    if [[ ! -e "$path" ]]; then
+				        echo "WARNING: File $path (required by module $toload) does not exist."
+				        continue
+					    fi
+					source "$path"
+					end
+					unset -f start end
+				done < "$HOME/.config/workflow/modules.loaded"
+				rm "$HOME/.config/workflow/modules.loaded"
+				touch "$HOME/.config/workflow/.lock"
+				break
+			fi
 		else
-			path="$(grep $toload $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
+			path="$(grep $mod $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
 			if [[ -z "$path" ]]; then
-				echo "WARNING: Module $toload was supposed to be loaded, but it is not specified in the modules file."
+				echo "WARNING: Module $mod was supposed to be loaded, but it is not specified in the modules file."
 				continue
 			fi
 			if [[ ! -e "$path" ]]; then
-				echo "WARNING: File $path (required by module $toload) does not exist."
+				echo "WARNING: File $path (required by module $mod) does not exist."
 				continue
 			fi
 			source "$path"
 			start
-			echo "$toload" | awk '{print $1;}' >> "$HOME/.config/workflow/modules.loaded"
+			echo "$mod" | awk '{print $1;}' >> "$HOME/.config/workflow/modules.loaded"
 			unset -f start end
 		fi
 	done
 elif [[ -e "$HOME/.config/workflow/modules.enabled" ]]; then
-	while read -re toload; do
-		path="$(grep $toload $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
+	while read -re mod; do
+		path="$(grep $mod $HOME/.config/workflow/modules | sed 's/[^ ]* *//')"
 		if [[ -z "$path" ]]; then
-			echo "WARNING: Module $toload was supposed to be loaded, but it is not specified in the modules file."
+			echo "WARNING: Module $mod was supposed to be loaded, but it is not specified in the modules file."
 			continue
 		fi
 		if [[ ! -e "$path" ]]; then
-			echo "WARNING: File $path (required by module $toload) does not exist."
+			echo "WARNING: File $path (required by module $mod) does not exist."
 			continue
 		fi
 		source "$path"
 		start
-		echo "$toload" | awk '{print $1;}' >> "$HOME/.config/workflow/modules.loaded"
+		echo "$mod" | awk '{print $1;}' >> "$HOME/.config/workflow/modules.loaded"
 		unset -f start end
 	done < "$HOME/.config/workflow/modules.enabled"
 else
