@@ -2,3 +2,5 @@
 
 - Implement autoend feature (variable in module file?) (automatically end after startup time period has ended)
   * Requires modifying workflow-timer
+
+- Create CLI for creating and managing startup times
