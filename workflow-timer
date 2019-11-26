@@ -7,7 +7,7 @@ fi
 # This function takes care of refreshing the line-specific lockfiles. It is kept as a function because why not.
 lockfile_refresh() {
 	# Loop through all lockfiles. The match methods used here are simillar to the ones used in the main loop.
-	if [[ -e "$HOME/.config/workflow/.lock"* ]]; then
+	if [[ -a "$HOME/.config/workflow/.lock"* ]]; then
 		for lockfile in $HOME/.config/workflow/.lock-*; do
 			workdate="$(cat $lockfile)"
 			# This sets "week" and "hour" to 0: these values don't store the actual week and hour of activation. Rather, they serve as an indication of whether the week day and hour+minute match.
