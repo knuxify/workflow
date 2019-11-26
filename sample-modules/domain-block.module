@@ -1,0 +1,27 @@
+#!/usr/bin/bash
+
+##################################################################
+# Workflow module                                                #
+# Name: Domain block                                             #
+# Description: Customizable template for a temporary, hosts-file #
+#              based domain block.                               #
+# Notes: The hosts file has to be writable by the user that's    #
+#        executing this module.                                  #
+##################################################################
+
+## User modifiable values:
+unset domains
+domains="youtube.com twitter.com discorapp.com" # domains to block, separated by spaces
+
+start() {
+	echo "#START-DOMAIN-BLOCK" >> /etc/hosts
+	for domain in $domains; do
+		echo "127.0.0.1 $domain" >> /etc/hosts 
+	done
+	echo "#END-DOMAIN-BLOCK" >> /etc/hosts
+}
+end() {
+	rm /tmp/newhosts
+	sed -n '/#START\-DOMAIN\-BLOCK/,/#END\-DOMAIN\-BLOCK/!p' /etc/hosts > /tmp/newhosts
+	mv /tmp/newhosts /etc/hosts
+}
