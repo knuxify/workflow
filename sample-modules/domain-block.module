@@ -16,7 +16,7 @@ domains="youtube.com twitter.com discorapp.com" # domains to block, separated by
 start() {
 	echo "#START-DOMAIN-BLOCK" >> /etc/hosts
 	for domain in $domains; do
-		echo "127.0.0.1 $domain" >> /etc/hosts 
+		echo "127.0.0.1 $domain" >> /etc/hosts
 	done
 	echo "#END-DOMAIN-BLOCK" >> /etc/hosts
 }
